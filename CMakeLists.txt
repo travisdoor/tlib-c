@@ -65,9 +65,8 @@ target_include_directories(tlib PUBLIC
         $<INSTALL_INTERFACE:include>
         PRIVATE src)
 
-configure_file(src/config.h.in ${CMAKE_SOURCE_DIR}/include/tlib/config.h)
-
 if (${ENABLE_INSTALLATION})
+    configure_file(src/config.h.in ${CMAKE_SOURCE_DIR}/include/tlib/config.h)
     # Must use GNUInstallDirs to install libraries into correct
     # locations on all platforms.
     include(GNUInstallDirs)
