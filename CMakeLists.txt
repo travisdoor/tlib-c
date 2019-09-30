@@ -23,6 +23,7 @@ endif()
 
 set(SOURCE_FILES 
 	src/string.c
+	src/array.c
   )
 
 set(HEADER_FILES
@@ -30,6 +31,7 @@ set(HEADER_FILES
 	include/tlib/common.h
 	include/tlib/config.h
 	include/tlib/string.h
+	include/tlib/array.h
   )
 
 if (MSVC)
@@ -43,6 +45,7 @@ endif()
 add_library(tlib SHARED ${SOURCE_FILES} ${HEADER_FILES})
 
 if (${ENABLE_TESTS})
+    enable_testing()
     add_subdirectory(tests)
 endif()
 

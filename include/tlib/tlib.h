@@ -35,6 +35,7 @@ extern "C" {
 
 #include "tlib/config.h"
 #include "tlib/string.h"
+#include "tlib/array.h"
 
 #ifdef __cplusplus
 }

@@ -40,13 +40,12 @@ ensure_space(TString *str, usize space)
 	if (space <= T_ARRAY_SIZE(str->_tmp)) return;
 	if (str->allocated >= space) return;
 
-	space *= 2;
-
 	if (str->allocated == 0) {
 		s8 *tmp = malloc(space * sizeof(s8));
 		memcpy(tmp, str->data, str->len + 1);
 		str->data = tmp;
 	} else {
+		space *= 2;
 		str->data = realloc(str->data, space * sizeof(s8));
 	}
 
@@ -85,8 +84,11 @@ tstring_init(TString *str)
 void
 tstring_terminate(TString *str)
 {
-	if (!str->allocated) return;
-	free(str->data);
+	if (str->allocated) free(str->data);
+	str->allocated = 0;
+	str->len       = 0;
+	str->_tmp[0]   = '\0';
+	str->data      = str->_tmp;
 }
 
 void

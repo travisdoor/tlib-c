@@ -1,11 +1,11 @@
+#include "tlib/tlib.h"
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include "tlib/tlib.h"
 
 #define ASSERT(e)                                                                                  \
 	if (!(e)) {                                                                                \
-		printf("##e\n");                                                                   \
+		fprintf(stderr, "Assertion failed on line %d: '" #e "'\n", __LINE__);              \
 		abort();                                                                           \
 	}

@@ -1,7 +1,7 @@
 //*****************************************************************************
-// tlib-c 
+// tlib-c
 //
-// File:   config.h.in
+// File:   array.h
 // Author: Martin Dorazil
 // Date:   29/9/2019
 //
@@ -26,15 +26,61 @@
 // SOFTWARE.
 //*****************************************************************************
 
-#ifndef T_CONFIG_H
-#define T_CONFIG_H
+#ifndef T_ARRAY_H
+#define T_ARRAY_H
 
-/*
- * Values set automatically during build by cmake.
- */
-#define T_VERSION       "1.0.0"
-#define T_VERSION_MAJOR 1
-#define T_VERSION_MINOR 0
-#define T_VERSION_PATCH 0
+#include "tlib/common.h"
 
-#endif 
+#define TARRAY_FOREACH(T, _arr, _it)                                                               \
+	if ((_arr) && (_arr)->size)                                                                \
+		for (usize i = 0; i < (_arr)->size && ((_it) = tarray_at(T, (_arr), i)); ++i)
+
+typedef struct TArray {
+	void *data;
+	usize size;
+	usize allocated;
+	usize elem_size;
+} TArray;
+
+/* clang-format off */
+/* Create new array on heap. */
+T_API TArray *
+tarray_new(usize elem_size);
+
+/* Delete array on heap. */
+T_API void
+tarray_delete(TArray *arr);
+
+/* Initialize array. */
+T_API void 
+tarray_init(TArray *arr, usize elem_size);
+
+/* Terminate array. */
+T_API void
+tarray_terminate(TArray *arr);
+
+T_API void
+tarray_reserve(TArray *arr, usize size);
+
+T_API void
+tarray_clear(TArray *arr);
+
+T_API void
+_tarray_push(TArray *arr, void *v_ptr);
+
+#define tarray_at(T, _arr, _i) (*(T *)_tarray_at((_arr), (_i)))
+
+T_API void *
+_tarray_at(TArray *arr, usize i);
+
+#define tarray_push(_arr, _v) _tarray_push((_arr), &(_v))
+
+T_API void
+tarray_pop(TArray *arr);
+
+T_API void
+tarray_erase(TArray *arr, usize i);
+
+/* clang-format on */
+
+#endif
