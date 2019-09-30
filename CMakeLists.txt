@@ -25,6 +25,7 @@ set(SOURCE_FILES
 	src/string.c
 	src/array.c
 	src/hash_table.c
+	src/list.c
   )
 
 set(HEADER_FILES
@@ -34,6 +35,8 @@ set(HEADER_FILES
 	include/tlib/string.h
 	include/tlib/array.h
 	include/tlib/hash_table.h
+	include/tlib/small_array.h
+	include/tlib/list.h
   )
 
 if (MSVC)

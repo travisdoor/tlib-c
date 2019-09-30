@@ -27,9 +27,6 @@
 //*****************************************************************************
 
 #include "tlib/array.h"
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #define ALLOC_BLOCK_SIZE 32
 #define ELEM_PTR(_i) (&((u8 *)arr->data)[(_i)*arr->elem_size])

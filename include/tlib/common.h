@@ -31,7 +31,12 @@
 
 #include "tlib/config.h"
 #include <string.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
+#define TITERATOR_EQUAL(_first, _second) ((_first).opaque == (_second).opaque)
 #define TARRAY_SIZE(_array) (sizeof((_array)) / sizeof((_array)[0]))
 #define TABORT(_msg, ...)                                                                          \
 	{                                                                                          \
@@ -56,5 +61,10 @@ typedef unsigned long long u64;
 typedef size_t             usize;
 typedef float              f32;
 typedef double             f64;
+
+typedef struct TIterator {
+	void *opaque;
+} TIterator;
+
 
 #endif

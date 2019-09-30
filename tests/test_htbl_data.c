@@ -10,7 +10,7 @@ main(void)
 	}
 
 	ASSERT(tbl->size == 1024);
-	ASSERT(!titerator_equal(thtbl_begin(tbl), thtbl_end(tbl)));
+	ASSERT(!TITERATOR_EQUAL(thtbl_begin(tbl), thtbl_end(tbl)));
 
 	TIterator it;
 	s32       i = 0;

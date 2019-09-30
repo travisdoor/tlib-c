@@ -27,19 +27,16 @@
 //*****************************************************************************
 
 #include "tlib/hash_table.h"
-#include <assert.h>
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #define DEFAULT_EXPECTED_SIZE 64
 #define MAX_LOAD_FACTOR 1
-#define NODE_SIZE (sizeof(TNode) + tbl->data_size)
+#define NODE_SIZE (sizeof(struct THtblNode) + tbl->data_size)
 
-#define GET_DATA_PTR(_n) ((s8 *)(_n) + sizeof(TNode))
+#define GET_DATA_PTR(_n) ((s8 *)(_n) + sizeof(struct THtblNode))
 #define HASH_INDEX(_key) ((u64)((_key) % tbl->bucket_count))
-#define VALIDATE_ITER(iter)                                                                        \
-	assert((iter) != NULL && ((TNode *)(iter->opaque))->this == (iter->opaque))
+#define VALIDATE_ITER(_iter)                                                                        \
+	assert((_iter) != NULL && ((struct THtblNode *)((_iter)->opaque))->this == ((_iter)->opaque))
 
 static inline s32
 next_prime(s32 num)
@@ -56,10 +53,10 @@ next_prime(s32 num)
 	return num;
 }
 
-static TNode *
+static struct THtblNode *
 create_node(THashTable *tbl)
 {
-	TNode *new_node = malloc(NODE_SIZE);
+	struct THtblNode *new_node = malloc(NODE_SIZE);
 	memset(new_node, 0, NODE_SIZE);
 #ifndef NDEBUG
 	new_node->this = new_node;
@@ -68,7 +65,7 @@ create_node(THashTable *tbl)
 }
 
 static void
-insert_node(TNode *prev, TNode *next, TNode *new)
+insert_node(struct THtblNode *prev, struct THtblNode *next, struct THtblNode *new)
 {
 	if (prev) prev->next = new;
 	new->prev = prev;
@@ -77,7 +74,7 @@ insert_node(TNode *prev, TNode *next, TNode *new)
 }
 
 static TIterator
-erase_node(THashTable *tbl, TNode *node, TBucket *bucket)
+erase_node(THashTable *tbl, struct THtblNode *node, struct THtblBucket *bucket)
 {
 	if (bucket->first == bucket->last)
 		bucket->first = bucket->last = NULL;
@@ -105,7 +102,7 @@ void
 thtbl_init(THashTable *tbl, usize data_size, usize expected_size)
 {
 	tbl->data_size = data_size;
-	tbl->end       = (TNode){
+	tbl->end       = (struct THtblNode){
 #ifndef NDEBUG
 	    .this = &tbl->end,
 #endif
@@ -119,7 +116,7 @@ thtbl_init(THashTable *tbl, usize data_size, usize expected_size)
 	if (!expected_size) expected_size = DEFAULT_EXPECTED_SIZE;
 
 	tbl->bucket_count = (usize)next_prime((s32)ceil((f64)expected_size / (f64)MAX_LOAD_FACTOR));
-	tbl->buckets      = calloc(tbl->bucket_count, sizeof(TBucket));
+	tbl->buckets      = calloc(tbl->bucket_count, sizeof(struct THtblBucket));
 	tbl->size         = 0;
 }
 
@@ -127,7 +124,7 @@ void
 thtbl_terminate(THashTable *tbl)
 {
 	free(tbl->buckets);
-	tbl->size = 0;
+	tbl->size  = 0;
 	tbl->begin = &tbl->end;
 }
 
@@ -153,9 +150,9 @@ _thtbl_insert(THashTable *tbl, u64 key, void *data)
 {
 	const u64 hash = HASH_INDEX(key);
 
-	TBucket *bucket   = &tbl->buckets[hash];
-	TNode *  new_node = create_node(tbl);
-	new_node->key     = key;
+	struct THtblBucket *bucket   = &tbl->buckets[hash];
+	struct THtblNode *  new_node = create_node(tbl);
+	new_node->key                = key;
 
 	if (!bucket->first) {
 		// new empty bucket
@@ -165,7 +162,7 @@ _thtbl_insert(THashTable *tbl, u64 key, void *data)
 		tbl->begin = new_node;
 	} else {
 		// find conflicts
-		TNode *node = bucket->first;
+		struct THtblNode *node = bucket->first;
 		while (node) {
 			if (node->key == key) TABORT("Duplicate key: 0x%llx", key);
 			if (node == bucket->last) break;
@@ -187,10 +184,10 @@ _thtbl_insert(THashTable *tbl, u64 key, void *data)
 TIterator
 thtbl_find(THashTable *tbl, u64 key)
 {
-	const u64 hash   = HASH_INDEX(key);
-	TBucket * bucket = &tbl->buckets[hash];
+	const u64           hash   = HASH_INDEX(key);
+	struct THtblBucket *bucket = &tbl->buckets[hash];
 
-	TNode *node = bucket->first;
+	struct THtblNode *node = bucket->first;
 	while (node) {
 		if (node->key == key) return (TIterator){.opaque = node};
 		if (node == bucket->last) break;
@@ -205,7 +202,7 @@ _thtbl_at(THashTable *tbl, u64 key)
 {
 	TIterator iter     = thtbl_find(tbl, key);
 	TIterator iter_end = thtbl_end(tbl);
-	if (!titerator_equal(iter, iter_end)) return GET_DATA_PTR(iter.opaque);
+	if (!TITERATOR_EQUAL(iter, iter_end)) return GET_DATA_PTR(iter.opaque);
 
 	TABORT("No such key %llu in hash table.", key);
 }
@@ -213,25 +210,25 @@ _thtbl_at(THashTable *tbl, u64 key)
 TIterator
 thtbl_erase(THashTable *tbl, TIterator iter)
 {
-	VALIDATE_ITER(iter);
+	VALIDATE_ITER(&iter);
 
 	if (iter.opaque == &tbl->end) {
 		return (TIterator){.opaque = &tbl->end};
 	}
 
-	TNode *   node   = (TNode *)iter.opaque;
-	const u64 hash   = HASH_INDEX(node->key);
-	TBucket * bucket = &tbl->buckets[hash];
+	struct THtblNode *  node   = (struct THtblNode *)iter.opaque;
+	const u64           hash   = HASH_INDEX(node->key);
+	struct THtblBucket *bucket = &tbl->buckets[hash];
 	return erase_node(tbl, node, bucket);
 }
 
 TIterator
 thtbl_erase_key(THashTable *tbl, u64 key)
 {
-	const u64 hash   = HASH_INDEX(key);
-	TBucket * bucket = &tbl->buckets[hash];
+	const u64           hash   = HASH_INDEX(key);
+	struct THtblBucket *bucket = &tbl->buckets[hash];
 
-	TNode *node = bucket->first;
+	struct THtblNode *node = bucket->first;
 	while (node) {
 		if (node->key == key) {
 			return erase_node(tbl, node, bucket);
@@ -242,12 +239,12 @@ thtbl_erase_key(THashTable *tbl, u64 key)
 	TABORT("No such key %llu in hash table.", key);
 }
 
-s32
+bool
 thtbl_has_key(THashTable *tbl, u64 key)
 {
 	TIterator iter = thtbl_find(tbl, key);
 	TIterator end  = thtbl_end(tbl);
-	return !titerator_equal(iter, end);
+	return !TITERATOR_EQUAL(iter, end);
 }
 
 TIterator
@@ -266,41 +263,41 @@ void
 thtbl_iter_next(TIterator *iter)
 {
 	VALIDATE_ITER(iter);
-	TNode *node  = (TNode *)iter->opaque;
-	iter->opaque = node->next;
+	struct THtblNode *node = (struct THtblNode *)iter->opaque;
+	iter->opaque           = node->next;
 }
 
 u64
 thtbl_iter_peek_key(TIterator iter)
 {
-	VALIDATE_ITER(iter);
-	TNode *node = (TNode *)iter.opaque;
+	VALIDATE_ITER(&iter);
+	struct THtblNode *node = (struct THtblNode *)iter.opaque;
 	return node->key;
 }
 
 void *
 _thtbl_iter_peek_value(TIterator iter)
 {
-	VALIDATE_ITER(iter);
-	TNode *node = (TNode *)iter.opaque;
+	VALIDATE_ITER(&iter);
+	struct THtblNode *node = (struct THtblNode *)iter.opaque;
 	return GET_DATA_PTR(node);
 }
 
 void
 thtbl_clear(THashTable *tbl)
 {
-	TIterator iter     = thtbl_begin(tbl);
-	TIterator iter_end = thtbl_end(tbl);
-	TNode *   node     = NULL;
-	while (!titerator_equal(iter, iter_end)) {
-		node = (TNode *)iter.opaque;
+	TIterator         iter     = thtbl_begin(tbl);
+	TIterator         iter_end = thtbl_end(tbl);
+	struct THtblNode *node     = NULL;
+	while (!TITERATOR_EQUAL(iter, iter_end)) {
+		node = (struct THtblNode *)iter.opaque;
 
 		thtbl_iter_next(&iter);
 		free(node);
 	}
-	memset(tbl->buckets, 0, tbl->bucket_count * sizeof(TBucket));
+	memset(tbl->buckets, 0, tbl->bucket_count * sizeof(struct THtblBucket));
 
-	tbl->end = (TNode){
+	tbl->end = (struct THtblNode){
 #ifndef NDEBUG
 	    .this = &tbl->end,
 #endif

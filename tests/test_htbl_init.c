@@ -7,7 +7,7 @@ main(void)
 	ASSERT(tbl->data_size == sizeof(s32));
 	ASSERT(tbl->size == 0);
 	ASSERT(&tbl->end == tbl->begin);
-	ASSERT(titerator_equal(thtbl_begin(tbl), thtbl_end(tbl)));
+	ASSERT(TITERATOR_EQUAL(thtbl_begin(tbl), thtbl_end(tbl)));
 
 	thtbl_delete(tbl);
 	return 0;
