@@ -10,9 +10,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-# Must use GNUInstallDirs to install libraries into correct
-# locations on all platforms.
-include(GNUInstallDirs)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(ENABLE_TESTS TRUE)
+    set(ENABLE_INSTALLATION TRUE)
+else()
+    set(ENABLE_TESTING FALSE)
+    set(ENABLE_INSTALLATION FALSE)
+endif()
 
 set(DEFAULT_BUILD_TYPE "Release")
 if(NOT CMAKE_BUILD_TYPE)
@@ -48,7 +52,7 @@ endif()
 
 add_library(tlib SHARED ${SOURCE_FILES} ${HEADER_FILES})
 
-if (NOT DEFINED ${T_DISABLE_TESTS})
+if (${ENABLE_TESTS})
     enable_testing()
     add_subdirectory(tests)
 endif()
@@ -63,7 +67,11 @@ target_include_directories(tlib PUBLIC
 
 configure_file(src/config.h.in ${CMAKE_SOURCE_DIR}/include/tlib/config.h)
 
-if (NOT DEFINED ${T_DISABLE_INSTALLATION})
+if (${ENABLE_INSTALLATION})
+    # Must use GNUInstallDirs to install libraries into correct
+    # locations on all platforms.
+    include(GNUInstallDirs)
+
     # 'make install' to the correct locations (provided by GNUInstallDirs).
     install(TARGETS tlib
 	    EXPORT TLibConfig
