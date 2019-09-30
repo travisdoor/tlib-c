@@ -72,6 +72,7 @@ int
 main(void)
 {
 	s32_test();
+	s32_ptr_test();
 	struct_test();
 	return 0;
 }

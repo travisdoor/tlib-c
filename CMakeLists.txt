@@ -9,7 +9,6 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-set(ENABLE_TESTS 1)
 
 # Must use GNUInstallDirs to install libraries into correct
 # locations on all platforms.
@@ -49,7 +48,7 @@ endif()
 
 add_library(tlib SHARED ${SOURCE_FILES} ${HEADER_FILES})
 
-if (${ENABLE_TESTS})
+if (NOT DEFINED ${T_DISABLE_TESTS})
     enable_testing()
     add_subdirectory(tests)
 endif()
@@ -64,26 +63,28 @@ target_include_directories(tlib PUBLIC
 
 configure_file(src/config.h.in ${CMAKE_SOURCE_DIR}/include/tlib/config.h)
 
-# 'make install' to the correct locations (provided by GNUInstallDirs).
-install(TARGETS tlib
-        EXPORT TLibConfig
-        ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})  # This is for Windows
+if (NOT DEFINED ${T_DISABLE_INSTALLATION})
+    # 'make install' to the correct locations (provided by GNUInstallDirs).
+    install(TARGETS tlib
+	    EXPORT TLibConfig
+	    ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	    LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	    RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})  # This is for Windows
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/TLibConfigVersion.cmake
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion)
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_file(
+	    ${CMAKE_CURRENT_BINARY_DIR}/TLibConfigVersion.cmake
+	    VERSION ${PROJECT_VERSION}
+	    COMPATIBILITY AnyNewerVersion)
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-# This makes the project importable from the install directory
-# Put config file in per-project dir (name MUST match), can also
-# just go into 'cmake'.
-install(EXPORT TLibConfig DESTINATION share/tlib/cmake)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/TLibConfigVersion.cmake DESTINATION share/tlib/cmake)
+    # This makes the project importable from the install directory
+    # Put config file in per-project dir (name MUST match), can also
+    # just go into 'cmake'.
+    install(EXPORT TLibConfig DESTINATION share/tlib/cmake)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/TLibConfigVersion.cmake DESTINATION share/tlib/cmake)
 
-# This makes the project importable from the build directory
-export(TARGETS tlib FILE TLibConfig.cmake)
+    # This makes the project importable from the build directory
+    export(TARGETS tlib FILE TLibConfig.cmake)
+endif()
