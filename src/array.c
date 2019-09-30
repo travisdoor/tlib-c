@@ -104,10 +104,12 @@ tarray_clear(TArray *arr)
 void
 _tarray_push(TArray *arr, void *v_ptr)
 {
-	if (!v_ptr) return;
 	ensure_space(arr, arr->size + 1, false);
 
-	memcpy(ELEM_PTR(arr->size), v_ptr, arr->elem_size);
+	if (v_ptr) {
+		memcpy(ELEM_PTR(arr->size), v_ptr, arr->elem_size);
+	} 
+
 	arr->size += 1;
 }
 
