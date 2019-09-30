@@ -101,16 +101,18 @@ tarray_clear(TArray *arr)
 	arr->size = 0;
 }
 
-void
+void *
 _tarray_push(TArray *arr, void *v_ptr)
 {
 	ensure_space(arr, arr->size + 1, false);
 
+	void *elem_ptr = ELEM_PTR(arr->size);
 	if (v_ptr) {
-		memcpy(ELEM_PTR(arr->size), v_ptr, arr->elem_size);
-	} 
+		memcpy(elem_ptr, v_ptr, arr->elem_size);
+	}
 
 	arr->size += 1;
+	return elem_ptr;
 }
 
 void *

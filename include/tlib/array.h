@@ -73,7 +73,8 @@ tarray_reserve(TArray *arr, usize size);
 TAPI void
 tarray_clear(TArray *arr);
 
-TAPI void
+/* Return pointer to added element */
+TAPI void *
 _tarray_push(TArray *arr, void *v_ptr);
 
 TAPI void *
