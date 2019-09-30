@@ -39,7 +39,7 @@
 #define tarray_push(_arr, _v) _tarray_push((_arr), &(_v))
 
 /* Get array element at index. */
-#define tarray_at(T, _arr, _i) (*(T *)_tarray_at((_arr), (_i)))
+#define tarray_at(T, _arr, _i) (*(T *)_tarray_at(_arr, (_i)))
 
 typedef struct TArray {
 	void *data;
