@@ -31,6 +31,10 @@
 
 #include "tlib/common.h"
 
+#define TSA_FOREACH(arr, it)                                                                       \
+	if ((arr)->size)                                                                           \
+		for (size_t i = 0; i < (arr)->size && ((it) = (arr)->data[i]); ++i)
+
 typedef struct TSmallArrayAny {
 	void * data;
 	size_t size;

@@ -37,6 +37,11 @@
 #define tlist_front(list, type) (*(type *)_tlist_front((list)))
 #define tlist_back(list, type) (*(type *)_tlist_back((list)))
 
+#define TLIST_FOREACH(list, it)                                                                    \
+	(it) = tlist_begin((list));                                                                \
+	for (TIterator end = tlist_end((list)); !TITERATOR_EQUAL((it), end);                       \
+	     tlist_iter_next(&(it)))
+
 struct TListNode {
 	struct TListNode *prev;
 	struct TListNode *next;

@@ -7,6 +7,6 @@ Features
 * hash table
 * small array
 * string
-* debug tools
-* atomics
-* threading
+* TODO: debug tools
+* TODO: atomics
+* TODO: threading
