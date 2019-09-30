@@ -37,7 +37,7 @@ ensure_space(TString *str, usize space)
 {
 	if (!space) return;
 	space += 1; /* zero terminated */
-	if (space <= T_ARRAY_SIZE(str->_tmp)) return;
+	if (space <= TARRAY_SIZE(str->_tmp)) return;
 	if (str->allocated >= space) return;
 
 	if (str->allocated == 0) {
@@ -57,7 +57,7 @@ TString *
 tstring_new(void)
 {
 	TString *str = malloc(sizeof(TString));
-	if (!str) abort();
+	if (!str) TABORT("Bad alloc.");
 
 	tstring_init(str);
 	return str;

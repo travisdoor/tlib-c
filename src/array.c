@@ -57,7 +57,7 @@ TArray *
 tarray_new(usize elem_size)
 {
 	TArray *arr = malloc(sizeof(TArray));
-	if (!arr) abort();
+	if (!arr) TABORT("Bad alloc.");
 
 	tarray_init(arr, elem_size);
 	return arr;
@@ -75,7 +75,7 @@ tarray_delete(TArray *arr)
 void
 tarray_init(TArray *arr, usize elem_size)
 {
-	if (!elem_size) abort();
+	if (!elem_size) TABORT("Size of array element cannot be 0.");
 	arr->data      = NULL;
 	arr->size      = 0;
 	arr->allocated = 0;
@@ -117,7 +117,7 @@ _tarray_push(TArray *arr, void *v_ptr)
 void *
 _tarray_at(TArray *arr, usize i)
 {
-	if (i > arr->size) abort();
+	if (i > arr->size) TABORT("Array index out of the bounds.");
 	return ELEM_PTR(i);
 }
 

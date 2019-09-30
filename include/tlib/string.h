@@ -42,47 +42,47 @@ typedef struct TString {
 
 /* clang-format off */
 /* Create new string on heap. */
-T_API TString *
+TAPI TString *
 tstring_new(void);
 
 /* Delete string on heap. */
-T_API void
+TAPI void
 tstring_delete(TString *str);
 
 /* Initialize string. */
-T_API void 
+TAPI void 
 tstring_init(TString *str);
 
 /* Terminate string. */
-T_API void
+TAPI void
 tstring_terminate(TString *str);
 
 /* Reserve desired len, if current allocated block is big enough this function
  * has no effect.
  */
-T_API void
+TAPI void
 tstring_reserve(TString *str, usize len);
 
 /* Append c-string at the end. */
-T_API void
+TAPI void
 tstring_append(TString *str, const s8 *v);
 
 /* Append one character at the end. */
-T_API void
+TAPI void
 tstring_append_c(TString *str, const s8 v);
 
 /* Append N characters from c-string at the end. */
-T_API void
+TAPI void
 tstring_append_n(TString *str, const s8 *v, usize N);
 
 /* Set string based of formatting and passed data (similar to printf). 
  * This will clear old data.
  */
-T_API void
+TAPI void
 tstring_setf(TString *str, const s8 *format, ...);
 
 /* Clear the string, allocated block (does not free). */
-T_API void
+TAPI void
 tstring_clear(TString *str);
 /* clang-format on */
 

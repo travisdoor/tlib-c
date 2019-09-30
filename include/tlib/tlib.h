@@ -36,6 +36,7 @@ extern "C" {
 #include "tlib/config.h"
 #include "tlib/string.h"
 #include "tlib/array.h"
+#include "tlib/hash_table.h"
 
 #ifdef __cplusplus
 }

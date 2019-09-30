@@ -35,6 +35,12 @@
 	if ((_arr) && (_arr)->size)                                                                \
 		for (usize i = 0; i < (_arr)->size && ((_it) = tarray_at(T, (_arr), i)); ++i)
 
+/* Push into array. */
+#define tarray_push(_arr, _v) _tarray_push((_arr), &(_v))
+
+/* Get array element at index. */
+#define tarray_at(T, _arr, _i) (*(T *)_tarray_at((_arr), (_i)))
+
 typedef struct TArray {
 	void *data;
 	usize size;
@@ -44,41 +50,41 @@ typedef struct TArray {
 
 /* clang-format off */
 /* Create new array on heap. */
-T_API TArray *
+TAPI TArray *
 tarray_new(usize elem_size);
 
 /* Delete array on heap. */
-T_API void
+TAPI void
 tarray_delete(TArray *arr);
 
 /* Initialize array. */
-T_API void 
+TAPI void 
 tarray_init(TArray *arr, usize elem_size);
 
 /* Terminate array. */
-T_API void
+TAPI void
 tarray_terminate(TArray *arr);
 
-T_API void
+/* Reserve allocated size. */
+TAPI void
 tarray_reserve(TArray *arr, usize size);
 
-T_API void
+/* Clear array but keep allocations. */
+TAPI void
 tarray_clear(TArray *arr);
 
-T_API void
+TAPI void
 _tarray_push(TArray *arr, void *v_ptr);
 
-#define tarray_at(T, _arr, _i) (*(T *)_tarray_at((_arr), (_i)))
-
-T_API void *
+TAPI void *
 _tarray_at(TArray *arr, usize i);
 
-#define tarray_push(_arr, _v) _tarray_push((_arr), &(_v))
-
-T_API void
+/* Pop last value. */
+TAPI void
 tarray_pop(TArray *arr);
 
-T_API void
+/* Erase value at index. */
+TAPI void
 tarray_erase(TArray *arr, usize i);
 
 /* clang-format on */

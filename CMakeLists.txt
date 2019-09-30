@@ -24,6 +24,7 @@ endif()
 set(SOURCE_FILES 
 	src/string.c
 	src/array.c
+	src/hash_table.c
   )
 
 set(HEADER_FILES
@@ -32,6 +33,7 @@ set(HEADER_FILES
 	include/tlib/config.h
 	include/tlib/string.h
 	include/tlib/array.h
+	include/tlib/hash_table.h
   )
 
 if (MSVC)

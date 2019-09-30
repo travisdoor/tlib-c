@@ -29,15 +29,20 @@
 #ifndef T_COMMON_H
 #define T_COMMON_H
 
-#include <string.h>
 #include "tlib/config.h"
+#include <string.h>
 
-#define T_ARRAY_SIZE(_array) (sizeof((_array)) / sizeof((_array)[0]))
+#define TARRAY_SIZE(_array) (sizeof((_array)) / sizeof((_array)[0]))
+#define TABORT(_msg, ...)                                                                          \
+	{                                                                                          \
+		fprintf(stderr, (_msg), ##__VA_ARGS__);                                            \
+		abort();                                                                           \
+	}
 
 #ifdef _MSC_VER
-#define T_API __declspec(dllexport)
+#define TAPI __declspec(dllexport)
 #else
-#define T_API __attribute__((__visibility__("default")))
+#define TAPI __attribute__((__visibility__("default")))
 #endif
 
 typedef char               s8;
@@ -49,5 +54,7 @@ typedef unsigned short     u16;
 typedef unsigned int       u32;
 typedef unsigned long long u64;
 typedef size_t             usize;
+typedef float              f32;
+typedef double             f64;
 
 #endif
