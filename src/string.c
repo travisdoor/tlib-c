@@ -38,12 +38,12 @@ ensure_space(TString *str, usize space)
 	if (str->allocated >= space) return;
 
 	if (str->allocated == 0) {
-		s8 *tmp = malloc(space * sizeof(s8));
+		char *tmp = malloc(space * sizeof(char));
 		memcpy(tmp, str->data, str->len + 1);
 		str->data = tmp;
 	} else {
 		space *= 2;
-		str->data = realloc(str->data, space * sizeof(s8));
+		str->data = realloc(str->data, space * sizeof(char));
 	}
 
 	str->allocated = space;
@@ -95,7 +95,7 @@ tstring_reserve(TString *str, usize len)
 }
 
 void
-tstring_append(TString *str, const s8 *v)
+tstring_append(TString *str, const char *v)
 {
 	tstring_append_n(str, v, strlen(v));
 }
@@ -108,25 +108,25 @@ tstring_clear(TString *str)
 }
 
 void
-tstring_append_n(TString *str, const s8 *v, usize N)
+tstring_append_n(TString *str, const char *v, usize N)
 {
 	if (!v) return;
 	const usize new_len = str->len + N;
 	ensure_space(str, new_len);
 
-	memcpy(&str->data[str->len], v, N * sizeof(s8));
+	memcpy(&str->data[str->len], v, N * sizeof(char));
 	str->data[new_len] = '\0';
 	str->len           = new_len;
 }
 
 void
-tstring_append_c(TString *str, const s8 v)
+tstring_append_c(TString *str, const char v)
 {
 	tstring_append_n(str, &v, 1);
 }
 
 void
-tstring_setf(TString *str, const s8 *format, ...)
+tstring_setf(TString *str, const char *format, ...)
 {
 	tstring_clear(str);
 	ensure_space(str, strlen(format));
