@@ -51,7 +51,7 @@ else()
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -Wall -Wno-missing-braces")
 endif()
 
-add_library(tlib SHARED ${SOURCE_FILES} ${HEADER_FILES})
+add_library(tlib STATIC ${SOURCE_FILES} ${HEADER_FILES})
 
 if (${ENABLE_TESTS})
     enable_testing()
