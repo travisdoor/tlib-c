@@ -40,6 +40,7 @@ set(HEADER_FILES
 	include/tlib/hash_table.h
 	include/tlib/small_array.h
 	include/tlib/list.h
+	include/tlib/hash.h
   )
 
 if (MSVC)
