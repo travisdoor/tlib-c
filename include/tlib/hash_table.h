@@ -56,8 +56,8 @@ typedef struct THashTable {
 
 #define thtbl_insert(tbl, key, data) _thtbl_insert((tbl), (key), &(data))
 #define thtbl_insert_empty(tbl, key) _thtbl_insert((tbl), (key), NULL)
-#define thtbl_at(tbl, key, type) (*(type *)_thtbl_at((tbl), (key)))
-#define thtbl_iter_peek_value(iter, type) (*(type *)_thtbl_iter_peek_value((iter)))
+#define thtbl_at(T, tbl, key) (*(T*)_thtbl_at((tbl), (key)))
+#define thtbl_iter_peek_value(T, iter) (*(T *)_thtbl_iter_peek_value((iter)))
 
 #define THTBL_FOREACH(_htbl, _it)                                                                  \
 	(_it) = thtbl_begin((_htbl));                                                              \

@@ -17,11 +17,11 @@ main(void)
 	THTBL_FOREACH(tbl, it)
 	{
 		ASSERT(thtbl_has_key(tbl, i++));
-		ASSERT(thtbl_iter_peek_value(it, s32) == thtbl_iter_peek_key(it));
+		ASSERT(thtbl_iter_peek_value(s32, it) == thtbl_iter_peek_key(it));
 	}
 
 	it = thtbl_find(tbl, 66);
-	ASSERT(thtbl_iter_peek_value(it, s32) == thtbl_iter_peek_key(it));
+	ASSERT(thtbl_iter_peek_value(s32, it) == thtbl_iter_peek_key(it));
 
 	thtbl_erase(tbl, it);
 	ASSERT(!thtbl_has_key(tbl, 66));

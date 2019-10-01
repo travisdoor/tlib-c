@@ -33,9 +33,9 @@
 
 #define tlist_push_back(list, data) _tlist_push_back((list), &(data))
 #define tlist_push_front(list, data) _tlist_push_front((list), &(data))
-#define tlist_iter_peek(list, iter, type) (*(type *)_tlist_iter_peek((list), (iter)))
-#define tlist_front(list, type) (*(type *)_tlist_front((list)))
-#define tlist_back(list, type) (*(type *)_tlist_back((list)))
+#define tlist_iter_peek(T, list, iter) (*(T *)_tlist_iter_peek((list), (iter)))
+#define tlist_front(T, list) (*(T *)_tlist_front((list)))
+#define tlist_back(T, list) (*(T *)_tlist_back((list)))
 
 #define TLIST_FOREACH(list, it)                                                                    \
 	(it) = tlist_begin((list));                                                                \
