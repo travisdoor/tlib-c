@@ -32,7 +32,7 @@
 #include "tlib/common.h"
 
 static inline u32
-bo_hash_from_str(const char *str)
+thash_from_str(const char *str)
 {
 	u32 hash = 5381;
 	s32 c;
@@ -44,7 +44,7 @@ bo_hash_from_str(const char *str)
 }
 
 static inline u32
-bo_hash_from_strn(const char *str, usize len)
+thash_from_strn(const char *str, usize len)
 {
 	u32   hash = 5381;
 	usize i    = 0;
