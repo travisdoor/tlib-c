@@ -58,8 +58,13 @@ typedef struct TSmallArrayAny {
 	{                                                                                          \
 		if (desired_size <= S) goto SETUP;                                                 \
 		if (desired_size <= arr->allocated) goto SETUP;                                    \
+		if (arr->allocated == 0) {                                                         \
+			arr->data = (T *)malloc(desired_size * sizeof(T));                         \
+		} else {                                                                           \
+			arr->data = (T *)realloc(arr->data, desired_size * sizeof(T));             \
+		}                                                                                  \
+                                                                                                   \
 		arr->allocated = desired_size;                                                     \
-		arr->data      = (T *)realloc(arr->data, arr->allocated * sizeof(T));              \
 	SETUP:                                                                                     \
 		arr->size = desired_size;                                                          \
 	}                                                                                          \
