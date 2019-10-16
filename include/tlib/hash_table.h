@@ -35,7 +35,7 @@ struct THtblNode {
 	struct THtblNode *next;
 	struct THtblNode *prev;
 #ifndef NDEBUG
-	struct THtblNode *this;
+	struct THtblNode *_this;
 #endif
 	u64 key;
 };

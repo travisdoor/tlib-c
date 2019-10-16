@@ -29,7 +29,7 @@
 #include "tlib/list.h"
 
 #define VALIDATE_ITER(_iter)                                                                        \
-	assert((_iter) != NULL && ((struct TListNode *)((_iter)->opaque))->this == ((_iter)->opaque))
+	assert((_iter) != NULL && ((struct TListNode *)((_iter)->opaque))->_this == ((_iter)->opaque))
 
 #define GET_DATA_PTR(_n) ((s8 *)(_n) + sizeof(struct TListNode))
 #define GET_NODE_SIZE (sizeof(struct TListNode) + list->data_size)
@@ -41,7 +41,7 @@ insert_node(TList *list, struct TListNode *prev, struct TListNode *next, void *d
 {
 	struct TListNode *node = calloc(1, GET_NODE_SIZE);
 #ifndef NDEBUG
-	node->this = node;
+	node->_this = node;
 #endif
 	memcpy(GET_DATA_PTR(node), data, list->data_size);
 

@@ -36,7 +36,7 @@
 #define GET_DATA_PTR(_n) ((s8 *)(_n) + sizeof(struct THtblNode))
 #define HASH_INDEX(_key) ((u64)((_key) % tbl->bucket_count))
 #define VALIDATE_ITER(_iter)                                                                        \
-	assert((_iter) != NULL && ((struct THtblNode *)((_iter)->opaque))->this == ((_iter)->opaque))
+	assert((_iter) != NULL && ((struct THtblNode *)((_iter)->opaque))->_this == ((_iter)->opaque))
 
 static inline s32
 next_prime(s32 num)
@@ -59,7 +59,7 @@ create_node(THashTable *tbl)
 	struct THtblNode *new_node = malloc(NODE_SIZE);
 	memset(new_node, 0, NODE_SIZE);
 #ifndef NDEBUG
-	new_node->this = new_node;
+	new_node->_this = new_node;
 #endif
 	return new_node;
 }
@@ -104,7 +104,7 @@ thtbl_init(THashTable *tbl, usize data_size, usize expected_size)
 	tbl->data_size = data_size;
 	tbl->end       = (struct THtblNode){
 #ifndef NDEBUG
-	    .this = &tbl->end,
+	    ._this = &tbl->end,
 #endif
 	    .key  = 0,
 	    .prev = NULL,
@@ -299,7 +299,7 @@ thtbl_clear(THashTable *tbl)
 
 	tbl->end = (struct THtblNode){
 #ifndef NDEBUG
-	    .this = &tbl->end,
+	    ._this = &tbl->end,
 #endif
 	    .key  = 0,
 	    .prev = NULL,

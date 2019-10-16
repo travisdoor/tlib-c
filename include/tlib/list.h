@@ -46,7 +46,7 @@ struct TListNode {
 	struct TListNode *prev;
 	struct TListNode *next;
 #ifndef NDEBUG
-	struct TListNode *this;
+	struct TListNode *_this;
 #endif
 };
 
