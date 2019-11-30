@@ -123,6 +123,7 @@ thtbl_init(THashTable *tbl, usize data_size, usize expected_size)
 void
 thtbl_terminate(THashTable *tbl)
 {
+	thtbl_clear(tbl);
 	free(tbl->buckets);
 	tbl->size  = 0;
 	tbl->begin = &tbl->end;
