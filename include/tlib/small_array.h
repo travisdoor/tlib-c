@@ -61,7 +61,13 @@ typedef struct TSmallArrayAny {
 		if (arr->allocated == 0) {                                                         \
 			arr->data = (T *)malloc(desired_size * sizeof(T));                         \
 		} else {                                                                           \
-			arr->data = (T *)realloc(arr->data, desired_size * sizeof(T));             \
+			T *new_data = (T *)realloc(arr->data, desired_size * sizeof(T));           \
+			if (new_data) {                                                            \
+				arr->data = new_data;                                              \
+			} else {                                                                   \
+				free(arr->data);                                                   \
+				abort();                                                           \
+			}                                                                          \
 		}                                                                                  \
                                                                                                    \
 		arr->allocated = desired_size;                                                     \
@@ -78,7 +84,14 @@ typedef struct TSmallArrayAny {
 			memcpy(arr->data, arr->tmp, sizeof(T) * S);                                \
 		} else if (on_heap && arr->size == arr->allocated) {                               \
 			arr->allocated *= 2;                                                       \
-			arr->data = (T *)realloc(arr->data, arr->allocated * sizeof(T));           \
+                                                                                                   \
+			T *new_data = (T *)realloc(arr->data, arr->allocated * sizeof(T));         \
+			if (new_data) {                                                            \
+				arr->data = new_data;                                              \
+			} else {                                                                   \
+				free(arr->data);                                                   \
+				abort();                                                           \
+			}                                                                          \
 		}                                                                                  \
 		arr->data[arr->size++] = v;                                                        \
 	}                                                                                          \
