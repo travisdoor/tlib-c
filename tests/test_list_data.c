@@ -42,6 +42,12 @@ main(void)
 	ASSERT(list->size == 0);
 	ASSERT(tlist_empty(list));
 
+	BENCH_START("List push_back of 100000 elems. ")
+	for (s32 i = 0; i < 100000; ++i) {
+		tlist_push_back(list, i);
+	}
+	BENCH_END;
+
 	tlist_delete(list);
 	return 0;
 }

@@ -112,5 +112,4 @@ tlist_empty(TList *list);
 TAPI void
 tlist_clear(TList *list);
 /* clang-format on */
-
 #endif

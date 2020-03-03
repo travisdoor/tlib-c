@@ -5,11 +5,13 @@ s32_test(void)
 {
 	TArray *arr = tarray_new(sizeof(s32));
 
-	for (s32 i = 0; i < 100; ++i) {
-		tarray_push(arr, i);
-	}
+	BENCH_START("Array push_back of 100000 elems. ")
+		for (s32 i = 0; i < 100000; ++i) {
+			tarray_push(arr, i);
+		}
+	BENCH_END;
 
-	ASSERT(arr->size == 100);
+	ASSERT(arr->size == 100000);
 
 	s32 it;
 	TARRAY_FOREACH(s32, arr, it)
