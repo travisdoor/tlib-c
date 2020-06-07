@@ -144,6 +144,7 @@ thtbl_delete(THashTable *tbl)
 {
 	if (!tbl) return;
 	thtbl_terminate(tbl);
+	free(tbl);
 }
 
 void *
