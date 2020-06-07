@@ -46,6 +46,7 @@
 
 #ifdef _MSC_VER
 #define TAPI __declspec(dllexport)
+#pragma warning(disable : 4706)
 #else
 #define TAPI __attribute__((__visibility__("default")))
 #endif

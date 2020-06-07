@@ -67,7 +67,7 @@ typedef struct TSmallArrayAny {
 			T *tmp = arr->data;                                                        \
 			if ((arr->data = (T *)realloc(arr->data, desired_size * sizeof(T))) ==     \
 			    NULL) {                                                                \
-				free(arr->data);                                                   \
+				free(tmp);                                                         \
 				abort();                                                           \
 			}                                                                          \
 		}                                                                                  \
