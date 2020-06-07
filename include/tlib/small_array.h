@@ -60,11 +60,13 @@ typedef struct TSmallArrayAny {
 		if (desired_size <= arr->allocated) goto SETUP;                                    \
 		if (arr->allocated == 0) {                                                         \
 			arr->data = (T *)malloc(desired_size * sizeof(T));                         \
+			if (!arr->data) {                                                          \
+				abort();                                                           \
+			}                                                                          \
 		} else {                                                                           \
-			T *new_data = (T *)realloc(arr->data, desired_size * sizeof(T));           \
-			if (new_data) {                                                            \
-				arr->data = new_data;                                              \
-			} else {                                                                   \
+			T *tmp = arr->data;                                                        \
+			if ((arr->data = (T *)realloc(arr->data, desired_size * sizeof(T))) ==     \
+			    NULL) {                                                                \
 				free(arr->data);                                                   \
 				abort();                                                           \
 			}                                                                          \
@@ -81,15 +83,16 @@ typedef struct TSmallArrayAny {
 		if (!on_heap && arr->size == S) {                                                  \
 			arr->allocated = S * 2;                                                    \
 			arr->data      = (T *)malloc(sizeof(T) * arr->allocated);                  \
+			if (!arr->data) {                                                          \
+				abort();                                                           \
+			}                                                                          \
 			memcpy(arr->data, arr->tmp, sizeof(T) * S);                                \
 		} else if (on_heap && arr->size == arr->allocated) {                               \
 			arr->allocated *= 2;                                                       \
-                                                                                                   \
-			T *new_data = (T *)realloc(arr->data, arr->allocated * sizeof(T));         \
-			if (new_data) {                                                            \
-				arr->data = new_data;                                              \
-			} else {                                                                   \
-				free(arr->data);                                                   \
+			T *tmp = arr->data;                                                        \
+			if ((arr->data = (T *)realloc(arr->data, arr->allocated * sizeof(T))) ==   \
+			    NULL) {                                                                \
+				free(tmp);                                                         \
 				abort();                                                           \
 			}                                                                          \
 		}                                                                                  \
