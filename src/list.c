@@ -27,189 +27,200 @@
 //*****************************************************************************
 
 #include "tlib/list.h"
+#include "tmemory.h"
 
-#define VALIDATE_ITER(_iter)                                                                        \
-	assert((_iter) != NULL && ((struct TListNode *)((_iter)->opaque))->_this == ((_iter)->opaque))
+#define VALIDATE_ITER(_iter)                                                                       \
+    assert((_iter) != NULL && ((struct TListNode *)((_iter)->opaque))->_this == ((_iter)->opaque))
 
 #define GET_DATA_PTR(_n) ((s8 *)(_n) + sizeof(struct TListNode))
 #define GET_NODE_SIZE (sizeof(struct TListNode) + list->data_size)
 #define ERROR_ON_EMPTY                                                                             \
-	if (tlist_empty(list)) TABORT("List is empty.");
+    if (tlist_empty(list)) TABORT("List is empty.");
+
+static struct TListNode *node_get(TList *list)
+{
+    struct TListNode *node;
+    if (list->buf.size > 0) {
+        const usize buf_len = list->buf.size;
+        node                = tarray_at(struct TListNode *, &list->buf, buf_len - 1);
+        list->buf.size -= 1;
+    } else {
+        node = tmalloc(GET_NODE_SIZE);
+    }
+    memset(node, 0, GET_NODE_SIZE);
+    return node;
+}
+
+static void node_put(TList *list, struct TListNode *node)
+{
+    tarray_push(&list->buf, node);
+}
 
 static struct TListNode *
 insert_node(TList *list, struct TListNode *prev, struct TListNode *next, void *data)
 {
-	struct TListNode *node = calloc(1, GET_NODE_SIZE);
+    struct TListNode *node = node_get(list);
 #ifndef NDEBUG
-	node->_this = node;
+    node->_this = node;
 #endif
-	memcpy(GET_DATA_PTR(node), data, list->data_size);
-
-	if (prev) prev->next = node;
-	node->prev = prev;
-	if (next) next->prev = node;
-	node->next = next;
-
-	list->size++;
-
-	return node;
+    memcpy(GET_DATA_PTR(node), data, list->data_size);
+    if (prev) prev->next = node;
+    node->prev = prev;
+    if (next) next->prev = node;
+    node->next = next;
+    list->size++;
+    return node;
 }
 
 /* return pointer to next node */
-static struct TListNode *
-erase_node(TList *list, struct TListNode *node)
+static struct TListNode *erase_node(TList *list, struct TListNode *node)
 {
-	struct TListNode *ret = node->next;
-	if (node->prev) {
-		node->prev->next = node->next;
-		node->next->prev = node->prev;
-	} else {
-		list->begin      = node->next;
-		node->next->prev = NULL;
-	}
-
-	free(node);
-	list->size--;
-	return ret;
+    struct TListNode *ret = node->next;
+    if (node->prev) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    } else {
+        list->begin      = node->next;
+        node->next->prev = NULL;
+    }
+    node_put(list, node);
+    list->size--;
+    return ret;
 }
 
-TList *
-tlist_new(usize data_size)
+TList *tlist_new(usize data_size)
 {
-	TList *list = calloc(1, sizeof(TList));
-	if (!list) TABORT("Bad alloc");
+    TList *list = tmalloc(sizeof(TList));
+    memset(list, 0, sizeof(TList));
+    if (!list) TABORT("Bad alloc");
 
-	tlist_init(list, data_size);
-	return list;
+    tlist_init(list, data_size);
+    return list;
 }
 
-void
-tlist_delete(TList *list)
+void tlist_delete(TList *list)
 {
-	if (!list) return;
-	tlist_terminate(list);
-	free(list);
+    if (!list) return;
+    tlist_terminate(list);
+    tfree(list);
 }
 
-void
-tlist_init(TList *list, usize data_size)
+void tlist_init(TList *list, usize data_size)
 {
-	list->data_size = data_size;
-	list->begin     = &list->end;
-	list->size      = 0;
+    tarray_init(&list->buf, GET_NODE_SIZE);
+    list->data_size = data_size;
+    list->begin     = &list->end;
+    list->size      = 0;
 }
 
-void
-tlist_terminate(TList *list)
+void tlist_terminate(TList *list)
 {
-	tlist_clear(list);
-	list->size  = 0;
-	list->begin = &list->end;
-	list->size  = 0;
+    tlist_clear(list);
+    list->size  = 0;
+    list->begin = &list->end;
+    list->size  = 0;
+    struct TListNode *node;
+    TARRAY_FOREACH(struct TListNode *, &list->buf, node)
+    {
+        tfree(node);
+    }
+    tarray_terminate(&list->buf);
 }
 
-void
-_tlist_push_back(TList *list, void *data)
+void tlist_reserve(TList *list, usize count)
 {
-	struct TListNode *node = insert_node(list, list->end.prev, &list->end, data);
-	if (list->size == 1) list->begin = node;
+    tarray_reserve(&list->buf, count);
 }
 
-void
-tlist_pop_back(TList *list)
+void _tlist_push_back(TList *list, void *data)
 {
-	ERROR_ON_EMPTY;
-	erase_node(list, list->end.prev);
+    struct TListNode *node = insert_node(list, list->end.prev, &list->end, data);
+    if (list->size == 1) list->begin = node;
 }
 
-void
-_tlist_push_front(TList *list, void *data)
+void tlist_pop_back(TList *list)
 {
-	struct TListNode *node = NULL;
-
-	if (list->size == 0)
-		node = insert_node(list, NULL, &list->end, data);
-	else
-		node = insert_node(list, NULL, list->begin, data);
-
-	list->begin = node;
+    ERROR_ON_EMPTY;
+    erase_node(list, list->end.prev);
 }
 
-void
-tlist_pop_front(TList *list)
+void _tlist_push_front(TList *list, void *data)
 {
-	ERROR_ON_EMPTY;
-	erase_node(list, list->begin);
+    struct TListNode *node = NULL;
+
+    if (list->size == 0)
+        node = insert_node(list, NULL, &list->end, data);
+    else
+        node = insert_node(list, NULL, list->begin, data);
+
+    list->begin = node;
 }
 
-void
-tlist_iter_next(TIterator *iter)
+void tlist_pop_front(TList *list)
 {
-	VALIDATE_ITER(iter);
-	struct TListNode *node = (struct TListNode *)iter->opaque;
-	iter->opaque           = node->next;
+    ERROR_ON_EMPTY;
+    erase_node(list, list->begin);
 }
 
-void *
-_tlist_iter_peek(TIterator iter)
+void tlist_iter_next(TIterator *iter)
 {
-	VALIDATE_ITER(&iter);
-	return GET_DATA_PTR(iter.opaque);
+    VALIDATE_ITER(iter);
+    struct TListNode *node = (struct TListNode *)iter->opaque;
+    iter->opaque           = node->next;
 }
 
-TIterator
-tlist_begin(TList *list)
+void *_tlist_iter_peek(TIterator iter)
 {
-	return (TIterator){.opaque = list->begin};
+    VALIDATE_ITER(&iter);
+    return GET_DATA_PTR(iter.opaque);
 }
 
-TIterator
-tlist_end(TList *list)
+TIterator tlist_begin(TList *list)
 {
-	return (TIterator){.opaque = &list->end};
+    return (TIterator){.opaque = list->begin};
 }
 
-void *
-_tlist_front(TList *list)
+TIterator tlist_end(TList *list)
 {
-	ERROR_ON_EMPTY;
-	return GET_DATA_PTR(list->begin);
+    return (TIterator){.opaque = &list->end};
 }
 
-void *
-_tlist_back(TList *list)
+void *_tlist_front(TList *list)
 {
-	ERROR_ON_EMPTY;
-	return GET_DATA_PTR(list->end.prev);
+    ERROR_ON_EMPTY;
+    return GET_DATA_PTR(list->begin);
 }
 
-bool
-tlist_empty(TList *list)
+void *_tlist_back(TList *list)
 {
-	return !list->size;
+    ERROR_ON_EMPTY;
+    return GET_DATA_PTR(list->end.prev);
 }
 
-void
-tlist_erase(TList *list, TIterator *iter)
+bool tlist_empty(TList *list)
 {
-	VALIDATE_ITER(iter);
-	iter->opaque = erase_node(list, (struct TListNode *)iter->opaque);
+    return !list->size;
 }
 
-void
-tlist_clear(TList *list)
+void tlist_erase(TList *list, TIterator *iter)
 {
-	TIterator         iter    = tlist_begin(list);
-	TIterator         end     = tlist_end(list);
-	struct TListNode *current = NULL;
+    VALIDATE_ITER(iter);
+    iter->opaque = erase_node(list, (struct TListNode *)iter->opaque);
+}
 
-	while (!TITERATOR_EQUAL(iter, end)) {
-		current = (struct TListNode *)iter.opaque;
-		tlist_iter_next(&iter);
+void tlist_clear(TList *list)
+{
+    TIterator         iter    = tlist_begin(list);
+    TIterator         end     = tlist_end(list);
+    struct TListNode *current = NULL;
 
-		free(current);
-	}
+    while (!TITERATOR_EQUAL(iter, end)) {
+        current = (struct TListNode *)iter.opaque;
+        tlist_iter_next(&iter);
 
-	list->size  = 0;
-	list->begin = &list->end;
+        tfree(current);
+    }
+
+    list->size  = 0;
+    list->begin = &list->end;
 }

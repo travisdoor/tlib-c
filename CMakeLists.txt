@@ -25,6 +25,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(SOURCE_FILES 
+	src/common.c
 	src/string.c
 	src/array.c
 	src/hash_table.c
@@ -41,6 +42,7 @@ set(HEADER_FILES
 	include/tlib/small_array.h
 	include/tlib/list.h
 	include/tlib/hash.h
+	src/tmemory.h
   )
 
 if (MSVC)
@@ -49,6 +51,11 @@ if (MSVC)
 else()
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -DNDEBUG")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -Wall -Wno-missing-braces")
+endif()
+
+if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wno-nullability-completeness")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wno-nullability-completeness")
 endif()
 
 add_library(tlib STATIC ${SOURCE_FILES} ${HEADER_FILES})

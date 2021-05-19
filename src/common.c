@@ -1,7 +1,7 @@
 //*****************************************************************************
 // tlib-c
 //
-// File:   tlib.h
+// File:   common.c
 // Author: Martin Dorazil
 // Date:   29/9/2019
 //
@@ -26,23 +26,21 @@
 // SOFTWARE.
 //*****************************************************************************
 
-#ifndef T_TLIB_H
-#define T_TLIB_H
+#include "tlib/common.h"
+#include "tmemory.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "tlib/array.h"
-#include "tlib/config.h"
-#include "tlib/hash.h"
-#include "tlib/hash_table.h"
-#include "tlib/list.h"
-#include "tlib/small_array.h"
-#include "tlib/string.h"
-
-#ifdef __cplusplus
+static void *default_malloc(usize size, const char *filename, s32 line)
+{
+    (void)filename;
+    (void)line;
+    return malloc(size);
 }
-#endif
 
-#endif
+TAllocFn _tmalloc = &default_malloc;
+TFreeFn  _tfree   = &free;
+
+void tlib_set_allocator(TAllocFn malloc_fn, TFreeFn free_fn)
+{
+    _tmalloc = malloc_fn;
+    _tfree   = free_fn;
+}

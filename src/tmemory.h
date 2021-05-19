@@ -1,7 +1,7 @@
 //*****************************************************************************
 // tlib-c
 //
-// File:   tlib.h
+// File:   tmemory.h
 // Author: Martin Dorazil
 // Date:   29/9/2019
 //
@@ -26,23 +26,8 @@
 // SOFTWARE.
 //*****************************************************************************
 
-#ifndef T_TLIB_H
-#define T_TLIB_H
+#define tmalloc(size) _tmalloc(size, __FILE__, __LINE__)
+#define tfree(ptr) _tfree(ptr)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "tlib/array.h"
-#include "tlib/config.h"
-#include "tlib/hash.h"
-#include "tlib/hash_table.h"
-#include "tlib/list.h"
-#include "tlib/small_array.h"
-#include "tlib/string.h"
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+extern TAllocFn _tmalloc;
+extern TFreeFn  _tfree;

@@ -32,12 +32,12 @@
 #include "tlib/common.h"
 
 typedef struct TString {
-	char *  data;
-	usize len;
-	usize allocated;
+    char *data;
+    usize len;
+    usize allocated;
 
-	/* Small strings can fit into this statically callocated block. */
-	char _tmp[64];
+    /* Small strings can fit into this statically allocated block. */
+    char _tmp[64];
 } TString;
 
 /* clang-format off */
@@ -78,8 +78,17 @@ tstring_append_n(TString *str, const char *v, usize N);
 /* Set string based of formatting and passed data (similar to printf). 
  * This will clear old data.
  */
+#define tstring_setf(str, format, ...) \
+    {\
+        tstring_clear(str);\
+        tstring_appendf(str, format, ##__VA_ARGS__);\
+    }
+
 TAPI void
-tstring_setf(TString *str, const char *format, ...);
+tstring_appendf(TString *str, const char *format, ...);
+
+TAPI s32
+tstring_replace_all(TString *str, char old, char replace);
 
 /* Clear the string, allocated block (does not free). */
 TAPI void
