@@ -29,6 +29,7 @@
 #include "tlib/string.h"
 #include "tmemory.h"
 #include <stdarg.h>
+#include <stdlib.h>
 
 static void ensure_space(TString *str, usize space)
 {
@@ -82,7 +83,7 @@ void tstring_init(TString *str)
 
 void tstring_terminate(TString *str)
 {
-    if (str->allocated) tfree(str->data);
+    if (str->allocated) free(str->data);
     str->allocated = 0;
     str->len       = 0;
     str->_tmp[0]   = '\0';
@@ -124,6 +125,7 @@ void tstring_append_c(TString *str, const char v)
 void tstring_appendf(TString *str, const char *format, ...)
 {
     ensure_space(str, str->len + strlen(format));
+    char    buf[20];
     va_list argp;
     va_start(argp, format);
     while (*format != '\0') {
@@ -134,6 +136,10 @@ void tstring_appendf(TString *str, const char *format, ...)
             } else if (*format == 's') {
                 char *s = va_arg(argp, char *);
                 tstring_append(str, s);
+            } else if (*format == 'd') {
+                s32 num = va_arg(argp, s32);
+                snprintf(buf, TARRAY_SIZE(buf), "%d", num);
+                tstring_append(str, buf);
             } else {
                 fputs("Unsupported formatting character for 'tstring_setf'.", stdout);
             }
