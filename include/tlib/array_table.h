@@ -51,7 +51,7 @@ typedef struct TArrayTable {
 // Peek pointer to the value from the iterator.
 #define tatbl_iter_peek_value(T, tbl, iter) (*(T *)_tatbl_iter_peek_value((tbl), (iter)))
 
-// Utilitity macro for iteration over the hash table.
+// Utilitity macro for iteration over the array table.
 #define TATBL_FOREACH(T, _tbl, _it_key, _it_value)                                                 \
     if ((_tbl) && tatbl_size(_tbl))                                                                \
         for (usize i = 0;                                                                          \
@@ -65,14 +65,14 @@ static inline usize tatbl_size(TArrayTable *tbl)
     return tbl->keys.size;
 }
 
-// Create new hash table on heap. The 'expected_size' represents expected count of table entries
+// Create new array table on heap. The 'expected_size' represents expected count of table entries
 // (operation over the table can be slower when inserted entry count is greater than expected).
 TAPI TArrayTable *tatbl_new(usize data_size, usize expected_size);
 
 // Release all resources used by table.
 TAPI void tatbl_delete(TArrayTable *tbl);
 
-// Initialize hash table. The 'expected_size' represents expected count of table entries
+// Initialize array table. The 'expected_size' represents expected count of table entries
 // (operation over the table can be slower when inserted entry count is greater than expected).
 TAPI void tatbl_init(TArrayTable *tbl, usize data_size, usize expected_size);
 
